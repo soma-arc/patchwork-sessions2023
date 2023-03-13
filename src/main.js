@@ -38,4 +38,13 @@ window.addEventListener('load', () => {
     progress(0);
     render(ctx);
     loop();
+
+    const graphCanvas = document.getElementById('graphCanvas');
+    const c = graphCanvas.getContext('2d');
+    c.translate(0, graphCanvas.height * 0.5);
+    c.scale(1, -1);
+    c.scale(0.1, 1);
+    c.fillStyle = 'red';
+    c.fillRect(0, 0, graphCanvas.width, graphCanvas.height * 0.5);
+    scene.drawGraph(c);
 });

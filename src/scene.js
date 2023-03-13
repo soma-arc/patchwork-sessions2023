@@ -37,4 +37,8 @@ export default class Scene {
             obj.render(ctx);
         }
     }
+
+    drawGraph(ctx) {
+        this.#timeLines[0].drawGraph(ctx);
+    }
 }

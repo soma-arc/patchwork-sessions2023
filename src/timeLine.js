@@ -15,6 +15,10 @@ export default class TimeLine {
      * @type {Array.<function()>}
      */
     #boundFieldUpdaters = [];
+
+    /**
+     * @param {number} initialValue
+     */
     constructor(initialValue) {
         this.#value = initialValue;
         this.#initialValue = initialValue;
@@ -44,5 +48,21 @@ export default class TimeLine {
         this.#boundFieldUpdaters.push(() => {
             obj[prop] = this.#value;
         });
+    }
+
+    drawGraph(ctx) {
+        ctx.strokeStyle = 'black';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(0, 0);
+        const timeSplitMillis = 100;
+        for(let x = 0; x < 5000; x += timeSplitMillis) {
+            let v;
+            for(const curve of this.#curves) {
+                 v = curve.value(x);
+            }
+            ctx.lineTo(x, v);
+        }
+        ctx.stroke();
     }
 }
