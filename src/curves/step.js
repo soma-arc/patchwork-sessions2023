@@ -6,9 +6,7 @@ export default class Step extends Curve {
      * @param {number} targetValue
      */
     constructor(startMillis, targetValue) {
-        super(startMillis, startMillis);
-        this.targetValue = targetValue;
-        this.startValue = 0;
+        super(startMillis, startMillis, targetValue);
     }
 
     /**

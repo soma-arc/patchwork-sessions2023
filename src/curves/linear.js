@@ -7,8 +7,7 @@ export default class Linear extends Curve {
      * @param {number} targetValue
      */
     constructor(startMillis, endMillis, targetValue) {
-        super(startMillis, endMillis);
-        this.targetValue = targetValue;
+        super(startMillis, endMillis, targetValue);
         this.startValue = 0;
         this.diff = this.targetValue - this.startValue;
     }

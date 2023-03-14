@@ -27,7 +27,9 @@ export default class TimeLine {
     progress(timeMillis) {
         // 各種のイージングオブジェクトなどを通した後の値を設定する
         for(const curve of this.#curves) {
-            this.#value = curve.value(timeMillis);
+            if(curve.startMillis <= timeMillis && timeMillis <= curve.endMillis) {
+                this.#value = curve.value(timeMillis);
+            }
         }
 
         for(const updater of this.#boundFieldUpdaters) {
@@ -36,10 +38,12 @@ export default class TimeLine {
     }
 
     addCurve(curve) {
+        // 現状, Curveの追加は早いものから順に加えなければならない
+        // 途中で挿入したい場合はソートを実装する必要がある
         if(this.#curves.length === 0) {
-            curve.startValue = this.#initialValue;
+            curve.setStartValue(this.#initialValue);
         } else {
-            curve.startValue = this.#curves[this.#curves.length - 1].targetValue;
+            curve.setStartValue(this.#curves[this.#curves.length - 1].targetValue);
         }
         this.#curves.push(curve);
     }
@@ -55,11 +59,13 @@ export default class TimeLine {
         ctx.lineWidth = 1;
         ctx.beginPath();
         ctx.moveTo(0, 0);
-        const timeSplitMillis = 100;
+        const timeSplitMillis = 10;
+        let v = 0;
         for(let x = 0; x < 5000; x += timeSplitMillis) {
-            let v;
             for(const curve of this.#curves) {
-                 v = curve.value(x);
+                if(curve.startMillis <= x && x <= curve.endMillis) {
+                    v = curve.value(x);
+                }
             }
             ctx.lineTo(x, v);
         }
