@@ -31,6 +31,18 @@ module.exports = () => ({
                 ]
             },
             {
+                test: /\.(njk|nunjucks)\.(glsl|vert|frag)$/,
+                use: [
+                    {
+                        loader: 'nunjucks-loader'
+                    }
+                ]
+            },
+            {
+                test: /\.(wav|mp3)$/,
+                type: 'asset/resource'
+            },
+            {
                 test: /\.js$/,
                 use: [
                     {
