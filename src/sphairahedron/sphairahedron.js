@@ -24,13 +24,16 @@ export default class Sphairahedron {
         this.maxSlicePlanes = 12;
 
         this.prismSpheres = new Array(3);
-        this.planes = [];
+        this.prismPlanes = [];
         this.boundingPlanes = [];
 
         this.inversionSphere = new Sphere(0, 0, 0, 1);
 
         this.bboxMin = [Number.MAX_VALUE, Number.MAX_VALUE, Number.MAX_VALUE];
         this.bboxMax = [-Number.MAX_VALUE, -Number.MAX_VALUE, -Number.MAX_VALUE];
+
+        this.maxIterations = 100;
+        this.fudgeFactor = 0.2;
     }
 
     update() {
@@ -43,14 +46,135 @@ export default class Sphairahedron {
         this.computeSeedSpheres();
         this.computeConvexSphere();
         this.computeBoundingVolume();
-
-        this.updated();
     }
 
+    getContext() {
+        return {
+            numPrismSpheres: this.prismSpheres.length,
+            numPrismPlanes: this.prismPlanes.length,
+            numDividePlanes: this.dividePlanes.length,
+            numFiniteSpheres: this.gSpheres.length,
+            numConvexSpheres: this.convexSpheres.length,
+        };
+    }
+
+    /**
+     * infinite sphairahedronに関連するUniform Locationを用意する
+     */
+    getUniformLocationsInfinite(gl, program) {
+        this.uniLocations = [];
+        this.uniLocations.push(gl.getUniformLocation(program, 'u_sphairahedron.zbzc'));
+        for(let i = 0; i < this.prismSpheres.length; i++) {
+            this.uniLocations.push(gl.getUniformLocation(program, `u_sphairahedron.prismSpheres[${i}]`));
+        }
+        for(let i = 0; i < this.prismPlanes.length; i++) {
+            this.uniLocations.push(gl.getUniformLocation(program, `u_sphairahedron.prismPlanes[${i}].normal`));
+            this.uniLocations.push(gl.getUniformLocation(program, `u_sphairahedron.prismPlanes[${i}].origin`));
+        }
+        for(let i = 0; i < this.dividePlanes.length; i++) {
+            this.uniLocations.push(gl.getUniformLocation(program, `u_sphairahedron.dividePlanes[${i}].normal`));
+            this.uniLocations.push(gl.getUniformLocation(program, `u_sphairahedron.dividePlanes[${i}].origin`));
+        }
+        this.uniLocations.push(gl.getUniformLocation(program, 'u_sphairahedron.boundingPlaneY'));
+
+        this.uniLocations.push(gl.getUniformLocation(program, 'u_sphairahedron.maxIterations'));
+        this.uniLocations.push(gl.getUniformLocation(program, 'u_sphairahedron.fudgeFactor'));
+    }
+
+    setUniformValuesInfinite(gl) {
+        let index = 0;
+        gl.uniform2f(this.uniLocations[index++], this.zb, this.zc);
+        for(let i  = 0; i < this.prismSpheres.length; i++) {
+            this.uniform4f(this.uniLocations[index++],
+                           this.prismSpheres[i].center.x,
+                           this.prismSpheres[i].center.y,
+                           this.prismSpheres[i].center.z, this.prismSpheres[i].r);
+        }
+
+        for(let i  = 0; i < this.prismPlanes.length; i++) {
+            this.uniform3f(this.uniLocations[index++],
+                           this.prismPlanes[i].normal.x,
+                           this.prismPlanes[i].normal.y,
+                           this.prismPlanes[i].normal.z);
+            this.uniform3f(this.uniLocations[index++],
+                           this.prismPlanes[i].p1.x,
+                           this.prismPlanes[i].p1.y,
+                           this.prismPlanes[i].p1.z);
+        }
+
+        for (let i = 0; i < this.dividePlanes.length; i++) {
+            this.uniform3f(this.uniLocations[index++],
+                           this.dividePlanes[i].normal.x,
+                           this.dividePlanes[i].normal.y,
+                           this.dividePlanes[i].normal.z);
+            this.uniform3f(this.uniLocations[index++],
+                           this.dividePlanes[i].p1.x,
+                           this.dividePlanes[i].p1.y,
+                           this.dividePlanes[i].p1.z);
+        }
+        gl.uniform1f(this.uniLocations[index++], this.boundingPlaneY);
+        
+        gl.uniform1i(this.uniLocations[index++], this.maxIterations);
+        gl.uniform1f(this.uniLocations[index++], this.fudgeFactor);
+    }
+
+    /**
+     * finite sphairahedronに関連するUniformLocationを用意する
+     */
+    getUniformLocationsFinite(gl, program) {
+        this.uniLocations = [];
+        this.uniLocations.push(gl.getUniformLocation(program, 'u_sphairahedron.zbzc'));
+        for(let i = 0; i < this.prismSpheres.length; i++) {
+            this.uniLocations.push(gl.getUniformLocation(program, `u_sphairahedron.finiteSpheres[${i}]`));
+        }
+        for(let i = 0; i < this.convexSpheres.length; i++) {
+            this.uniLocations.push(gl.getUniformLocation(program, `u_sphairahedron.convexSpheres[${i}]`));
+        }
+        this.uniLocations.push(gl.getUniformLocation(program, 'u_sphairahedron.boundingSphere'));
+
+        this.uniLocations.push(gl.getUniformLocation(program, 'u_sphairahedron.maxIterations'));
+        this.uniLocations.push(gl.getUniformLocation(program, 'u_sphairahedron.fudgeFactor'));
+    }
+
+    setUniformValuesFinite(gl) {
+        let index = 0;
+        gl.uniform2f(this.uniLocations[index++], this.zb, this.zc);
+        for(let i  = 0; i < this.gSpheres.length; i++) {
+            gl.uniform4f(this.uniLocations[index++],
+                         this.gSpheres[i].center.x,
+                         this.gSpheres[i].center.y,
+                         this.gSpheres[i].center.z, this.gSpheres[i].r);
+        }
+        for(let i  = 0; i < this.convexSpheres.length; i++) {
+            gl.uniform4f(this.uniLocations[index++],
+                         this.convexSpheres[i].center.x,
+                         this.convexSpheres[i].center.y,
+                         this.convexSpheres[i].center.z, this.convexSpheres[i].r);
+        }
+
+        gl.uniform4f(this.uniLocations[index++],
+                     this.boundingSphere.center.x,
+                     this.boundingSphere.center.y,
+                     this.boundingSphere.center.z,
+                     this.boundingSphere.r);
+
+        gl.uniform1i(this.uniLocations[index++], this.maxIterations);
+        gl.uniform1f(this.uniLocations[index++], this.fudgeFactor);
+    }
+
+    /**
+     * プリズム型Sphairahedronの面を構成している球を反転させてfinite sphairahedronの構成要素にする反転球を求める
+     */
     computeInversionSphere() {}
 
+    /**
+     * プリズム型Sphairahedronを構成する球を求める
+     */
     computeSpheres() {}
 
+    /**
+     * finite sphairahedronを構成する球を求める
+     */
     computeGenSpheres() {}
 
     computeVertexes() {
@@ -103,7 +227,7 @@ export default class Sphairahedron {
                                                                 this.gSpheres[this.vertexIndexes[i][2]]));
         }
     }
-    
+
     computeConvexSphere() {
         this.convexSpheres = [];
         for (let i = 0; i < this.numDividePlanes; i++) {
@@ -131,7 +255,6 @@ export default class Sphairahedron {
         }
         this.boundingPlaneY *= 1.01;
         this.boundingSphere.r *= 1.01;
-        this.boundingSphere.update();
     }
 
     /**

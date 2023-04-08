@@ -16,14 +16,19 @@ import Vec3 from './vector3d.js';
 
 import RENDER_VERTEX from './shaders/render.vert';
 import RENDER_FRAGMENT_TMPL from './shaders/scene1.njk.frag';
+import RENDER_SPHAIRAHEDRON_TMPL from './shaders/scene2.njk.frag';
 
 import GLUtils from './glUtils.js';
+
+import cubeSphairahedron from './sphairahedron/cube/implementations.js';
 
 export default class Scene {
     /** @type{Array.<TimeLine>} */
     #timeLines = [];
     #objects = [];
     constructor(canvas) {
+        this.sphairahedron = new cubeSphairahedron[0](0.2, 0.2);
+        this.sphairahedron.update();
         this.canvas = canvas;
         const circle = new Circle(0, 0, 10);
         this.#objects.push(circle);
@@ -89,8 +94,15 @@ export default class Scene {
 
         GLUtils.AttachShader(this.gl, RENDER_VERTEX,
                              this.renderProgram, this.gl.VERTEX_SHADER);
-        GLUtils.AttachShader(this.gl, RENDER_FRAGMENT_TMPL.render(this.getRenderContext()),
+
+        //GLUtils.AttachShader(this.gl, RENDER_FRAGMENT_TMPL.render(this.getRenderContext()),
+        //this.renderProgram, this.gl.FRAGMENT_SHADER);
+        const context = this.sphairahedron.getContext();
+        console.log(context);
+        console.log(RENDER_SPHAIRAHEDRON_TMPL.render(context));
+        GLUtils.AttachShader(this.gl, RENDER_SPHAIRAHEDRON_TMPL.render(context),
                              this.renderProgram, this.gl.FRAGMENT_SHADER);
+
         GLUtils.LinkProgram(this.gl, this.renderProgram);
         this.renderVAttrib = this.gl.getAttribLocation(this.renderProgram,
                                                        'a_vertex');

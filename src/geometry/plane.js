@@ -1,5 +1,5 @@
-import Vec3 from '.,/vector3d.js';
-import Vec2 from '.,/vector2d.js';
+import Vec3 from '../vector3d.js';
+import Vec2 from '../vector2d.js';
 import Sphere from './sphere.js';
 
 export default class Plane {

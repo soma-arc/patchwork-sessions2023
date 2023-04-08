@@ -16,7 +16,7 @@ window.addEventListener('load', () => {
     c.fillRect(0, 0, graphCanvas.width, graphCanvas.height * 0.5);
     renderManager.scene.drawGraph(c);
 
-    document.getElementById('startButton').addEventListener('load', () => {
+    document.getElementById('startButton').addEventListener('click', () => {
         const startMillis = Date.now();
         let prevTimeMillis = 0;
         const loop = () => {
@@ -33,7 +33,5 @@ window.addEventListener('load', () => {
         renderManager.progress(0);
         renderManager.render();
         loop();
-
-        
     });
 });
