@@ -9,7 +9,7 @@ export default class Cube extends Sphairahedron {
         this.numSpheres = 3;
         this.numPlanes = 3;
         this.vertexIndexes = [[0, 1, 2], [0, 3, 4], [2, 4, 5], [0, 1, 3],
-        [3, 4, 5], [1, 2, 5], [1, 3, 5], [0, 2, 4]];
+                              [3, 4, 5], [1, 2, 5], [1, 3, 5], [0, 2, 4]];
         this.numVertexes = this.vertexIndexes.length;
     }
 

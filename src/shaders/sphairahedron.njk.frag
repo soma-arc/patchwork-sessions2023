@@ -39,6 +39,14 @@ void SphereInvert(const vec4 sphere, inout vec3 pos, inout float dr) {
     pos = (diff * k) + sphere.rgb;
 }
 
+vec4 DistUnion(vec4 t1, vec4 t2) {
+    return (t1.x < t2.x) ? t1 : t2;
+}
+
+vec4 DistSubtract(vec4 t1, vec4 t2) {
+    return (t1.x > t2.x) ? t1 : t2;
+}
+
 float DistSphere(const vec4 sphere, const vec3 pos) {
     return distance(sphere.xyz, pos) - sphere.w;
 }
@@ -116,6 +124,8 @@ float DistTiledInfiniteSphairahedra(const Sphairahedron sphairahedron, vec3 pos,
     invNum = 0.;
     float d;
     for(int i = 0; i < sphairahedron.maxIterations; i++) {
+        bool inFund = true;
+
         {% for n in range(0, numPrismSpheres) %}
         if(distance(pos, sphairahedron.prismSpheres[{{ n }}].xyz) < sphairahedron.prismSpheres[{{ n }}].w) {
             invNum++;
@@ -128,14 +138,14 @@ float DistTiledInfiniteSphairahedra(const Sphairahedron sphairahedron, vec3 pos,
         pos -= sphairahedron.prismPlanes[{{ n }}].origin;
         d = dot(pos, sphairahedron.prismPlanes[{{ n }}].normal);
         if(d > 0.) {
+            inFund = false;
             invNum ++;
             pos -= 2. * d * sphairahedron.prismPlanes[{{ n }}].normal;
-            pos += sphairahedron.prismPlanes[{{ n }}].origin;
         }
         pos += sphairahedron.prismPlanes[{{ n }}].origin;
         {% endfor %}
 
-        break;
+        if(inFund) break;
     }
     return DistInfiniteSphairahedron(sphairahedron, pos) / abs(dr) * sphairahedron.fudgeFactor;
 }

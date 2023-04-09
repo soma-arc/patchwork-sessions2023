@@ -125,4 +125,8 @@ export default class Sphere {
         const p4 = this.invertOnPoint(invertSphere.center.add(new Vec3(coeffR, coeffR, -coeffR)));
         return Sphere.fromPoints(p1, p2, p3, p4);
     }
+
+    get rSq() {
+        return this.r * this.r;
+    }
 }

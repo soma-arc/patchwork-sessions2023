@@ -27,8 +27,6 @@ export default class Scene {
     #timeLines = [];
     #objects = [];
     constructor(canvas) {
-        this.sphairahedron = new cubeSphairahedron[0](0.2, 0.2);
-        this.sphairahedron.update();
         this.canvas = canvas;
         const circle = new Circle(0, 0, 10);
         this.#objects.push(circle);
@@ -84,7 +82,10 @@ export default class Scene {
         this.#timeLines.push(timeLine2);
         this.#timeLines.push(timeLine3);
 
-        this.camera = new Camera(new Vec3(0, 0, 10),
+        this.sphairahedron = new cubeSphairahedron[0](0.21, 0.2);
+        this.sphairahedron.update();
+
+        this.camera = new Camera(new Vec3(0, 10, 10),
                                  new Vec3(0, 0, 0),
                                  60, new Vec3(0, 1, 0));
 
@@ -110,6 +111,8 @@ export default class Scene {
         this.textureFrameBuffer = this.gl.createFramebuffer();
         this.outputTexture = GLUtils.CreateRGBAFloatTexture(this.gl, this.canvas.width, this.canvas.height);
 
+        this.sphairahedron.getUniformLocations(this.canvas.gl, this.renderProgram);
+        this.sphairahedron.setUniformValues(this.canvas.gl);
         this.getUniformLocations();
     }
 
