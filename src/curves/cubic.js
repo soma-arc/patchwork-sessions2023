@@ -7,7 +7,6 @@ export class EaseInCubic extends Curve {
     }
 }
 
-
 export class EaseOutCubic extends Curve {
     value(timeMillis) {
         const x = this.normalizeValue(timeMillis);

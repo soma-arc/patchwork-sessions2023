@@ -32,7 +32,7 @@ export default class TimeLine {
             }
         }
 
-        for(const updater of this.#boundFieldUpdaters) {
+        for (const updater of this.#boundFieldUpdaters) {
             updater();
         }
     }
@@ -60,7 +60,7 @@ export default class TimeLine {
         ctx.beginPath();
         ctx.moveTo(0, 0);
         const timeSplitMillis = 10;
-        let v = 0;
+        let v = this.#initialValue;
         for(let x = 0; x < 5000; x += timeSplitMillis) {
             for(const curve of this.#curves) {
                 if(curve.startMillis <= x && x <= curve.endMillis) {

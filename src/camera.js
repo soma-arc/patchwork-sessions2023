@@ -14,24 +14,26 @@ export default class Camera {
         this.prevTarget = target;
         this.fovDegrees = fovDegrees;
         this.up = up;
+        this.uniLocations = [];
     }
 
-    setUniformLocations(gl, uniLocations, program) {
-        uniLocations.push(gl.getUniformLocation(program, 'u_camera.pos'));
-        uniLocations.push(gl.getUniformLocation(program, 'u_camera.target'));
-        uniLocations.push(gl.getUniformLocation(program, 'u_camera.fovRad'));
-        uniLocations.push(gl.getUniformLocation(program, 'u_camera.up'));
+    setUniformLocations(gl, program) {
+        this.uniLocations.splice(0);
+        this.uniLocations.push(gl.getUniformLocation(program, 'u_camera.pos'));
+        this.uniLocations.push(gl.getUniformLocation(program, 'u_camera.target'));
+        this.uniLocations.push(gl.getUniformLocation(program, 'u_camera.fovRad'));
+        this.uniLocations.push(gl.getUniformLocation(program, 'u_camera.up'));
     }
 
-    setUniformValues(gl, uniLocations, uniI) {
-        gl.uniform3f(uniLocations[uniI++],
+    setUniformValues(gl) {
+        let index = 0;
+        gl.uniform3f(this.uniLocations[index++],
                      this.pos.x, this.pos.y, this.pos.z);
-        gl.uniform3f(uniLocations[uniI++],
+        gl.uniform3f(this.uniLocations[index++],
                      this.target.x, this.target.y, this.target.z);
-        gl.uniform1f(uniLocations[uniI++],
+        gl.uniform1f(this.uniLocations[index++],
                      this.fovDegrees / 180.0);
-        gl.uniform3f(uniLocations[uniI++],
+        gl.uniform3f(this.uniLocations[index++],
                      this.up.x, this.up.y, this.up.z);
-        return uniI;
     }
 }

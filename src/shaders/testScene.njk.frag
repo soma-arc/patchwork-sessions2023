@@ -9,8 +9,6 @@ out vec4 outColor;
 uniform Camera u_camera;
 uniform vec2 u_resolution;
 
-uniform vec4 u_spheres[1];
-
 const int OBJ_ID_SPHERE = 0;
 
 // +y → -y
@@ -22,7 +20,7 @@ vec4 computeColor(const vec3 rayOrigin, const vec3 rayDir) {
     vec3 l = vec3(0);
     vec3 rayPos = rayOrigin;
 
-    IntersectSphere(OBJ_ID_SPHERE, vec3(1, 0, 0), u_spheres[0],
+    IntersectSphere(OBJ_ID_SPHERE, vec3(1, 0, 0), vec4(0, 0, 0, 1),
                     rayPos, rayDir, isectInfo);
 
     if(isectInfo.hit) {

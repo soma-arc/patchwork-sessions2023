@@ -5,12 +5,4 @@ export default class Sphere {
         this.z = z;
         this.r = r;
     }
-
-    setUniformLocations() {
-        
-    }
-
-    setUniformValues() {
-        
-    }
 }
