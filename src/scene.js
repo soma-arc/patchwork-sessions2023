@@ -99,6 +99,6 @@ export default class Scene {
     }
 
     renderGraph(ctx) {
-        this.#timeLines[0].drawGraph(ctx);
+        //this.#timeLines[0].drawGraph(ctx);
     }
 }

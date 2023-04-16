@@ -23,4 +23,14 @@ export default class Circle {
         ctx.arc(this.center.x, this.center.y, this.r, 0, 2 * Math.PI);
         ctx.stroke();
     }
+
+    invertOnPoint(p) {
+        const d = p.sub(this.center);
+        const len = d.length();
+        return d.scale(this.rSq / (len * len)).add(this.center);
+    }
+
+    get rSq() {
+        return this.r * this.r;
+    }
 }

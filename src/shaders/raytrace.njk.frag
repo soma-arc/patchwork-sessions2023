@@ -50,14 +50,6 @@ vec3 CalcRayOrtho (const vec3 eye, const vec3 target, const vec3 up, const float
     return v;
 }
 
-vec2 Rand2n(const vec2 co, const float sampleIndex) {
-    vec2 seed = co * (sampleIndex + 1.0);
-    seed+=vec2(-1,1);
-    // implementation based on: lumina.sourceforge.net/Tutorials/Noise.html
-    return vec2(fract(sin(dot(seed.xy ,vec2(12.9898,78.233))) * 43758.5453),
-                fract(cos(dot(seed.xy ,vec2(4.898,7.23))) * 23421.631));
-}
-
 void IntersectSphere(const int objId, const vec3 matColor,
                      const vec4 sphere,
                      const vec3 rayOrigin, const vec3 rayDir, inout IsectInfo isectInfo){

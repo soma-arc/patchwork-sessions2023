@@ -9,17 +9,20 @@ export default class RenderManager {
     init() {
         const sceneBuilder = new SceneBuilder(this.canvas);
         this.scene1 = sceneBuilder.genScene1();
+        this.circlesScene = sceneBuilder.genScene2();
+        this.chainScene = sceneBuilder.genFourCirclesChain();
 
+        this.currentScene = this.chainScene;
         this.renderGraph();
     }
     
     progress(timeMillis) {
-        this.scene1.progress(timeMillis);
+        this.currentScene.progress(timeMillis);
     }
 
     render() {
-        this.scene1.renderToTexture();
-        this.canvas.renderTextureToCanvas(this.scene1.outputTexture);
+        this.currentScene.renderToTexture();
+        this.canvas.renderTextureToCanvas(this.currentScene.outputTexture);
     }
 
     renderGraph() {
@@ -29,6 +32,6 @@ export default class RenderManager {
         ctx.scale(1, -1);
         ctx.scale(0.1, 10);
 
-        this.scene1.renderGraph(ctx);
+        this.currentScene.renderGraph(ctx);
     }
 }

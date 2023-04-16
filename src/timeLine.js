@@ -48,9 +48,12 @@ export default class TimeLine {
         this.#curves.push(curve);
     }
 
-    bindField(obj, prop) {
+    bindField(obj, prop, onUpdated) {
         this.#boundFieldUpdaters.push(() => {
             obj[prop] = this.#value;
+            if(onUpdated !== undefined) {
+                onUpdated();
+            }
         });
     }
 

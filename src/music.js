@@ -10,11 +10,11 @@ export default class Music {
     }
 
     constructor() {
-        Tone.start();
-        this.kickPlayer = new Tone.Player(kick).toDestination();
     }
 
     async setup() {
+        Tone.start();
+        this.kickPlayer = new Tone.Player(kick).toDestination();
         await Tone.loaded();
         Tone.Transport.bpm.value = 130;
         Tone.Transport.scheduleRepeat(time => {
