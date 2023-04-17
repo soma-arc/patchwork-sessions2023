@@ -39,9 +39,22 @@ export default class FourCirclesChain {
         this.c4 = new Circle(d.x, d.y, Vec2.distance(d, this.s));
     }
 
-    // DFS() {
-    //     const generators = [this.c1, this.c2, this.c3, this.c4];
-    //     const circles = [generators];
-    //     const maxLevel = 3;
-    // }
+    DFS() {
+        const generators = [this.c1, this.c2, this.c3, this.c4];
+        const circles = [generators];
+        const tags = [[0, 1, 2, 3]];
+        const maxLevel = 3;
+        for (let level = 1; level < maxLevel; level++) {
+            circles.push([]);
+            tags.push([]);
+            for (let circleIndex = 0; circleIndex < circles[level - 1].length; circleIndex++) {
+                for (let i = 0; i < 4; i++) {
+                    if (tags[level - 1][circleIndex] === i) continue;
+                    circles[level].push(generators[i].invertOnCircle(circles[level - 1][circleIndex]));
+                    tags[level].push(i);
+                }
+            }
+        }
+        return circles;
+    }
 }

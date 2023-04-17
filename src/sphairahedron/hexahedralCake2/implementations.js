@@ -33,15 +33,6 @@ class CakeA extends Cake {
                                         new Vec3((cx + dx) * 0.5, 6, (cy + dy) * 0.5),
                                         new Vec3(dx, -3, dy),
                                         this.prismPlanes[2].normal);
-        this.slicePlanes[0][2] = this.prismPlanes[2];
-
-        this.slicePlanes[1][2] = this.prismPlanes[2].invertOnPlane(this.prismPlanes[0]);
-
-        this.slicePlanes[2][2] = this.prismPlanes[2].invertOnPlane(this.prismPlanes[0]);
-        this.slicePlanes[2][3] = this.prismPlanes[3].invertOnPlane(this.prismPlanes[1]);
-
-        this.slicePlanes[3][2] = this.prismPlanes[2].invertOnPlane(this.prismPlanes[0]);
-        this.slicePlanes[3][1] = this.prismPlanes[1].invertOnPlane(this.prismPlanes[3]);
     }
 
     computeInversionSphere() {
@@ -74,15 +65,6 @@ class CakeB extends Cake {
                                    new Vec3((cx + dx) * 0.5, 6, (cy + dy) * 0.5),
                                    new Vec3(dx, -2, dy),
                                    this.prismPlanes[2].normal);
-        this.slicePlanes[0][2] = this.prismPlanes[2];
-
-        this.slicePlanes[1][2] = this.prismPlanes[2].invertOnPlane(this.prismPlanes[0]);
-
-        this.slicePlanes[2][2] = this.prismPlanes[2].invertOnPlane(this.prismPlanes[0]);
-        this.slicePlanes[2][3] = this.prismPlanes[3].invertOnPlane(this.prismPlanes[1]);
-
-        this.slicePlanes[3][2] = this.prismPlanes[2].invertOnPlane(this.prismPlanes[0]);
-        this.slicePlanes[3][1] = this.prismPlanes[1].invertOnPlane(this.prismPlanes[3]);
     }
 
     computeInversionSphere() {
@@ -115,16 +97,6 @@ class CakeC extends Cake {
                                    new Vec3((cx + dx) * 0.5, 6, (cy + dy) * 0.5),
                                    new Vec3(dx, -3, dy),
                                    this.prismPlanes[2].normal);
-
-        this.slicePlanes[0][2] = this.prismPlanes[2];
-
-        this.slicePlanes[1][2] = this.prismPlanes[2].invertOnPlane(this.prismPlanes[0]);
-
-        this.slicePlanes[2][2] = this.prismPlanes[2].invertOnPlane(this.prismPlanes[0]);
-        this.slicePlanes[2][3] = this.prismPlanes[3].invertOnPlane(this.prismPlanes[1]);
-
-        this.slicePlanes[3][2] = this.prismPlanes[2].invertOnPlane(this.prismPlanes[0]);
-        this.slicePlanes[3][1] = this.prismPlanes[1].invertOnPlane(this.prismPlanes[3]);
     }
 
     computeInversionSphere() {

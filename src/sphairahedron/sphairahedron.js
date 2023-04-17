@@ -34,11 +34,14 @@ export default class Sphairahedron {
 
         this.maxIterations = 100;
         this.fudgeFactor = 0.2;
+
+        this.inversionSphereScale = 1.0;
     }
 
     update() {
         this.computeSpheres();
         this.computeInversionSphere();
+        this.inversionSphere.r *= this.inversionSphereScale;
         this.computeGenSpheres();
         this.computeVertexes();
         this.computeDividePlanes();

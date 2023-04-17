@@ -4,6 +4,7 @@ precision mediump float;
 
 out vec4 outColor;
 
+{% include "./utils.njk.frag" %}
 {% include "./raytrace.njk.frag" %}
 {% include "./sphairahedron.njk.frag" %}
 
@@ -12,11 +13,11 @@ uniform vec2 u_resolution;
 
 const int OBJ_ID_SPHAIRAHEDRON = 0;
 
-vec4 distFunc(const vec3 pos) {
+float g_invNum;
+vec4 distFunc(vec3 pos) {
     // hit = vec4(distance, obj id, undefined, undefined)
     vec4 hit = vec4(MAX_FLOAT, -1, -1, -1);
-    float num;
-    vec4 d = DistUnion(vec4(DistTiledInfiniteSphairahedra(u_sphairahedron, pos, num),
+    vec4 d = DistUnion(vec4(DistTiledFiniteSphairahedra(u_sphairahedron, pos, g_invNum),
                             OBJ_ID_SPHAIRAHEDRON, -1, -1),
                        hit);
     return d;
@@ -30,7 +31,7 @@ vec3 computeNormal(const vec3 p) {
 }
 
 const int MAX_MARCHING_LOOP = 5000;
-const float MARCHING_THRESHOLD = 0.001;
+const float MARCHING_THRESHOLD = 0.00001;
 void march(const vec3 rayOrg, const vec3 rayDir,
            const float tmin, const float tmax,
            inout IsectInfo isectInfo) {
@@ -46,7 +47,7 @@ void march(const vec3 rayOrg, const vec3 rayDir,
             isectInfo.objId = int(dist.y);
 
             if(isectInfo.objId == OBJ_ID_SPHAIRAHEDRON) {
-                isectInfo.matColor = vec3(1, 0, 0);
+                isectInfo.matColor = Hsv2rgb((1., -0.13 + (g_invNum) * 0.01), 1., 1.);
             }
             isectInfo.intersection = rayPos;
             isectInfo.normal = computeNormal(rayPos);

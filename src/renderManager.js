@@ -11,8 +11,9 @@ export default class RenderManager {
         this.scene1 = sceneBuilder.genScene1();
         this.circlesScene = sceneBuilder.genScene2();
         this.chainScene = sceneBuilder.genFourCirclesChain();
+        this.initialScene = sceneBuilder.genSphairahedronScene();
 
-        this.currentScene = this.chainScene;
+        this.currentScene = this.initialScene;
         this.renderGraph();
     }
     

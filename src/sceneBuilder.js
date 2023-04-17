@@ -2,14 +2,17 @@ import Music from './music.js';
 import Scene from './scene.js';
 import TimeLine from './timeLine.js';
 import {EaseInCubic, EaseOutCubic, EaseInOutCubic} from './curves/cubic.js';
+import Linear from './curves/linear.js';
 import Sphere from './geometry/sphere.js';
 import Circle from './geometry/circle.js';
+import Plane from './geometry/plane.js';
 import Camera from './camera.js';
 import Vec3 from './vector3d';
 import FourCirclesChain from './fourCirclesChain/fourCirclesChain.js';
-
+import HexahedralCake2 from './sphairahedron/hexahedralCake2/implementations.js';
 
 import SCENE1_FRAG_TMPL from './shaders/scene1.njk.frag';
+import SCENE2_FRAG_TMPL from './shaders/scene2.njk.frag';
 import CIRCLES_FRAG_TMPL from './shaders/sceneCircles.njk.frag';
 
 export default class SceneBuilder {
@@ -116,7 +119,7 @@ export default class SceneBuilder {
         const scene = new Scene(this.canvas, CIRCLES_FRAG_TMPL);
 
         const chain = new FourCirclesChain(0, 0, 1, 2.0);
-        console.log(chain);
+        console.log(chain.DFS());
         const numCircles = 4;
         const sceneContext = {
             numCircles: numCircles
@@ -164,6 +167,53 @@ export default class SceneBuilder {
         timeLine.bindField(chain, 'param', chain.update.bind(chain));
         timeLine.addCurve(new EaseInCubic(1000, 3000, 4));
         scene.addTimeLine(timeLine);
+        
+        scene.build();
+        return scene;
+    }
+
+    genSphairahedronScene() {
+        const scene = new Scene(this.canvas, SCENE2_FRAG_TMPL);
+        const timeLine = new TimeLine(1.0);
+        //timeLine.addCurve(new Linear(1000, 2000, 2.0));
+        // 1小節待った後
+        const init = Music.measureIntervalMillis;
+        // 四分音符8回 = 2小節
+        for(let i = 0; i < 8; i++) {
+            const startMillis = init + i * Music.quarterIntervalMillis;
+            timeLine.addCurve(new EaseInCubic(startMillis, startMillis + 100, 1.5));
+            timeLine.addCurve(new EaseOutCubic(startMillis + 100, startMillis + 200, 1));
+        }
+
+        const sphairahedron = new HexahedralCake2[0](0, 0);
+        sphairahedron.update();
+        console.log(sphairahedron);
+
+        const camera = new Camera(new Vec3(0, 2, 2),
+                                  sphairahedron.boundingSphere.center,
+                                  60, new Vec3(0, 1, 0));
+        timeLine.bindField(sphairahedron, 'inversionSphereScale', () => {
+            sphairahedron.update();
+            camera.target = sphairahedron.boundingSphere.center;
+        });
+        scene.addTimeLine(timeLine);
+
+        const uniLocations = [];
+
+        scene.setSceneContext(sphairahedron.getContext());
+
+        const setUnformLocations = (gl, program) => {
+            uniLocations.splice(0);
+            sphairahedron.getUniformLocations(gl, program);
+            camera.setUniformLocations(gl, program);
+        };
+        scene.addUniLocationsSetter(setUnformLocations);
+
+        const setUniformValues = (gl) => {
+            sphairahedron.setUniformValues(gl);
+            camera.setUniformValues(gl);
+        };
+        scene.addUniformValuesSetter(setUniformValues);
         
         scene.build();
         return scene;
