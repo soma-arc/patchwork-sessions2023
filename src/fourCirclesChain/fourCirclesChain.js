@@ -13,6 +13,7 @@ export default class FourCirclesChain {
         this.r = this.center.add(new Vec2(0, -this.radius));
         this.s = this.center.add(new Vec2(this.radius, 0));
 
+        this.index = 0;
         this.param = param;
         this.update();
     }

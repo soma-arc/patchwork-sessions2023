@@ -10,6 +10,9 @@ import Camera from './camera.js';
 import Vec3 from './vector3d';
 import FourCirclesChain from './fourCirclesChain/fourCirclesChain.js';
 import HexahedralCake2 from './sphairahedron/hexahedralCake2/implementations.js';
+import Cube from './sphairahedron/cube/implementations.js';
+import Vec2 from './vector2d';
+import Simplex from 'perlin-simplex';
 
 import SCENE1_FRAG_TMPL from './shaders/scene1.njk.frag';
 import SCENE2_FRAG_TMPL from './shaders/scene2.njk.frag';
@@ -119,7 +122,26 @@ export default class SceneBuilder {
         const scene = new Scene(this.canvas, CIRCLES_FRAG_TMPL);
 
         const chain = new FourCirclesChain(0, 0, 1, 2.0);
-        console.log(chain.DFS());
+        const circlesArray = chain.DFS();
+        const circles = circlesArray[circlesArray.length - 1];
+        
+        const split = (v1, v2, values) => {
+            const threshold = 0.01;
+            const d = Vec2.distance(v1, v2);
+            if (Math.abs(d) > threshold) {
+                const m = v1.add(v2).scale(0.5);
+                split(v1, m, values);
+                split(m, v2, values);
+            } else {
+                values.push(v1);
+                values.push(v2);
+            }
+        };
+        const values = [];
+        for(let i = 1; i < circles.length; i++) {
+            split(circles[i - 1].center, circles[i].center, values);
+        }
+
         const numCircles = 4;
         const sceneContext = {
             numCircles: numCircles
@@ -138,11 +160,11 @@ export default class SceneBuilder {
         scene.addUniLocationsSetter(setUnformLocations);
 
         const translation = [0, 0];
-        const scale = 5.0;
+        const scale = 2.0;
         
         const setUniformValues = (gl) => {
             let index = 0;
-            gl.uniform2f(uniLocations[index++], translation[0], translation[1]);
+            gl.uniform2f(uniLocations[index++], values[chain.index].x, values[chain.index].y);
             gl.uniform1f(uniLocations[index++], scale);
             gl.uniform3f(uniLocations[index++],
                          chain.c1.center.x,
@@ -164,9 +186,18 @@ export default class SceneBuilder {
         scene.addUniformValuesSetter(setUniformValues);
 
         const timeLine = new TimeLine(2.0);
-        timeLine.bindField(chain, 'param', chain.update.bind(chain));
-        timeLine.addCurve(new EaseInCubic(1000, 3000, 4));
-        scene.addTimeLine(timeLine);
+        timeLine.bindField(chain, 'param', () => {
+            chain.update();
+        });
+        timeLine.addCurve(new EaseInCubic(1000, 4000, 4));
+        //scene.addTimeLine(timeLine);
+
+        const indexTimeLine = new TimeLine(0);
+        indexTimeLine.bindField(chain, 'index', () => {
+            chain.index = Math.floor(chain.index);
+        });
+        indexTimeLine.addCurve(new Linear(1000, 30000, values.length - 1));
+        scene.addTimeLine(indexTimeLine);
         
         scene.build();
         return scene;
@@ -185,7 +216,8 @@ export default class SceneBuilder {
             timeLine.addCurve(new EaseOutCubic(startMillis + 100, startMillis + 200, 1));
         }
 
-        const sphairahedron = new HexahedralCake2[0](0, 0);
+        //const sphairahedron = new HexahedralCake2[0](0, 0);
+        const sphairahedron = new Cube[0](0.001, 0);
         sphairahedron.update();
         console.log(sphairahedron);
 
@@ -197,6 +229,21 @@ export default class SceneBuilder {
             camera.target = sphairahedron.boundingSphere.center;
         });
         scene.addTimeLine(timeLine);
+
+        const simplex = new Simplex();
+        const indexTimeLine = new TimeLine(0);
+        indexTimeLine.bindField(sphairahedron, 'zb', () => {
+            sphairahedron.zb = simplex.noise(sphairahedron.zb / 10, 0.5) * 1.2;
+            sphairahedron.update();
+            camera.target = sphairahedron.boundingSphere.center;
+        });
+        indexTimeLine.bindField(sphairahedron, 'zc', () => {
+            sphairahedron.zc = simplex.noise(0.6, sphairahedron.zc / 10) * 1.2;
+            sphairahedron.update();
+            camera.target = sphairahedron.boundingSphere.center;
+        });
+        indexTimeLine.addCurve(new Linear(1000, 10000, 10));
+        scene.addTimeLine(indexTimeLine);
 
         const uniLocations = [];
 
