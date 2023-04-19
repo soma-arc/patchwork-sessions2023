@@ -25,10 +25,12 @@ export default class TimeLine {
     }
 
     progress(timeMillis) {
+        this.isUpdated = false;
         // 各種のイージングオブジェクトなどを通した後の値を設定する
         for(const curve of this.#curves) {
             if(curve.startMillis <= timeMillis && timeMillis <= curve.endMillis) {
                 this.#value = curve.value(timeMillis);
+                this.isUpdated = true;
             }
         }
 
@@ -51,8 +53,8 @@ export default class TimeLine {
     bindField(obj, prop, onUpdated) {
         this.#boundFieldUpdaters.push(() => {
             obj[prop] = this.#value;
-            if(onUpdated !== undefined) {
-                onUpdated();
+            if(onUpdated !== undefined && this.isUpdated) {
+                onUpdated(this.#value);
             }
         });
     }

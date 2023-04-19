@@ -205,45 +205,66 @@ export default class SceneBuilder {
 
     genSphairahedronScene() {
         const scene = new Scene(this.canvas, SCENE2_FRAG_TMPL);
-        const timeLine = new TimeLine(1.0);
-        //timeLine.addCurve(new Linear(1000, 2000, 2.0));
-        // 1小節待った後
-        const init = Music.measureIntervalMillis;
-        // 四分音符8回 = 2小節
-        for(let i = 0; i < 8; i++) {
-            const startMillis = init + i * Music.quarterIntervalMillis;
-            timeLine.addCurve(new EaseInCubic(startMillis, startMillis + 100, 1.5));
-            timeLine.addCurve(new EaseOutCubic(startMillis + 100, startMillis + 200, 1));
-        }
 
         //const sphairahedron = new HexahedralCake2[0](0, 0);
-        const sphairahedron = new Cube[0](0.001, 0);
+        const sphairahedron = new Cube[0](0.00001, 0);
         sphairahedron.update();
         console.log(sphairahedron);
 
-        const camera = new Camera(new Vec3(0, 2, 2),
+        const camera = new Camera(new Vec3(0, 2, 0.5),
                                   sphairahedron.boundingSphere.center,
                                   60, new Vec3(0, 1, 0));
-        timeLine.bindField(sphairahedron, 'inversionSphereScale', () => {
-            sphairahedron.update();
-            camera.target = sphairahedron.boundingSphere.center;
-        });
-        scene.addTimeLine(timeLine);
 
-        const simplex = new Simplex();
-        const indexTimeLine = new TimeLine(0);
+
+        const cameraTimeLine = new TimeLine(0);
+        cameraTimeLine.addCurve(new Linear(0, Music.measureIntervalMillis * 7 + 2 * Music.eighthIntervalMillis, 7.0));
+        cameraTimeLine.bindField(camera, '', (value) => {
+            camera.pos = new Vec3(0.5 * Math.cos(value), 2, 0.5 * Math.sin(value));
+        });
+        
+        scene.addTimeLine(cameraTimeLine);
+        
+        const indexTimeLine = new TimeLine(0.000001);
+
         indexTimeLine.bindField(sphairahedron, 'zb', () => {
-            sphairahedron.zb = simplex.noise(sphairahedron.zb / 10, 0.5) * 1.2;
             sphairahedron.update();
             camera.target = sphairahedron.boundingSphere.center;
         });
-        indexTimeLine.bindField(sphairahedron, 'zc', () => {
-            sphairahedron.zc = simplex.noise(0.6, sphairahedron.zc / 10) * 1.2;
-            sphairahedron.update();
-            camera.target = sphairahedron.boundingSphere.center;
-        });
-        indexTimeLine.addCurve(new Linear(1000, 10000, 10));
+        //indexTimeLine.addCurve(new Linear(Music.measureIntervalMillis * 3,
+        //Music.measureIntervalMillis * 7, 1));
+        const ini = Music.measureIntervalMillis * 3;
+        indexTimeLine.addCurve(new EaseInCubic(ini, ini + 200, 0.15 ));
+        let startMillis2;
+        for(let i = 0; i < 15; i++) {
+            const startMillis = ini + i * Music.quarterIntervalMillis;
+            indexTimeLine.addCurve(new EaseOutCubic(startMillis + 200, startMillis + 400, -0.18 * (Math.floor(i / 4) + 1)));
+            startMillis2 = ini + (i + 1) * Music.quarterIntervalMillis;
+            indexTimeLine.addCurve(new EaseOutCubic(startMillis2, startMillis2 + 200, 0.18 * (Math.floor((i + 1) / 4) + 1)));
+        }
+            
+        indexTimeLine.addCurve(new EaseOutCubic(ini + 16 * Music.quarterIntervalMillis-200,
+                                                ini + 16 * Music.quarterIntervalMillis + 200,
+                                                -0.6157635467980292));
         scene.addTimeLine(indexTimeLine);
+
+        const zcTimeLine = new TimeLine(0);
+        zcTimeLine.bindField(sphairahedron, 'zc', () => {
+            sphairahedron.update();
+            camera.target = sphairahedron.boundingSphere.center;
+        });
+        zcTimeLine.addCurve(new EaseOutCubic(ini + 16 * Music.quarterIntervalMillis - 200,
+                                             ini + 16 * Music.quarterIntervalMillis + 200,
+                                             0.6157635467980295));
+        scene.addTimeLine(zcTimeLine);
+
+        // const cameraTimeLine2 = new TimeLine(0.5);
+        // cameraTimeLine2.addCurve(new EaseOutCubic(startMillis2 + 200,
+        //                                           startMillis2 + Music.quarterIntervalMillis * 3,
+        //                                           3.0));
+        // cameraTimeLine2.bindField(camera, '', (value) => {
+        //     camera.pos = new Vec3(value * Math.cos(7.0), 2, value * Math.sin(7.0));
+        // });
+        // scene.addTimeLine(cameraTimeLine2);
 
         const uniLocations = [];
 

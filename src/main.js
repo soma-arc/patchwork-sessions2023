@@ -12,6 +12,7 @@ window.addEventListener('load', () => {
 });
 
 async function start(fullscreen) {
+    let stop = false;
     const fps = 60;
     const intervalMillis = 1000 / fps;
 
@@ -25,6 +26,10 @@ async function start(fullscreen) {
     const startMillis = Date.now();
     let prevTimeMillis = 0;
     const loop = () => {
+        if(stop) {
+            music.stop();
+            return;   
+        }
         const timeMillis = Date.now() - startMillis;
         if (timeMillis >= prevTimeMillis + intervalMillis) {
             const t = prevTimeMillis + intervalMillis;
@@ -35,6 +40,15 @@ async function start(fullscreen) {
         requestAnimationFrame(loop);
     };
 
+    function fullscreenchanged(event) {
+        if (!document.fullscreenElement) {
+            stop = true;
+            console.log('Leaving fullscreen mode.');
+        }
+    }
+
+    document.addEventListener('fullscreenchange', fullscreenchanged);
+    
     renderManager.progress(0);
     renderManager.render();
     music.start();

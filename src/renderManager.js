@@ -1,5 +1,6 @@
 import Canvas from './canvas.js';
 import SceneBuilder from './sceneBuilder.js';
+import Music from './music.js';
 
 export default class RenderManager {
     constructor(canvasId) {
@@ -18,6 +19,9 @@ export default class RenderManager {
     }
     
     progress(timeMillis) {
+        if(timeMillis > Music.measureIntervalMillis * 8) {
+            this.currentScene = this.circlesScene;
+        }
         this.currentScene.progress(timeMillis);
     }
 
