@@ -17,6 +17,7 @@ import Simplex from 'perlin-simplex';
 import SCENE1_FRAG_TMPL from './shaders/scene1.njk.frag';
 import SCENE2_FRAG_TMPL from './shaders/scene2.njk.frag';
 import CIRCLES_FRAG_TMPL from './shaders/sceneCircles.njk.frag';
+import CHAIN_TMPL from './shaders/chain.njk.frag';
 
 export default class SceneBuilder {
     constructor(canvas) {
@@ -74,7 +75,18 @@ export default class SceneBuilder {
     genScene2() {
         const scene = new Scene(this.canvas, CIRCLES_FRAG_TMPL);
 
-        const numCircles = 4;
+        const circles = [
+            new Circle(1, 1, 0),
+            new Circle(-1, 1, 0),
+            new Circle(-1, -1, 0),
+            new Circle(1, -1, 0),
+            new Circle(0, 0, 0),
+            new Circle(0.522734315, 0, 0),
+            new Circle(0, 0.522734315, 0),
+            new Circle(-0.522734315, 0, 0),
+            new Circle(0, -0.522734315, 0),
+        ];
+        const numCircles = circles.length;
         const sceneContext = {
             numCircles: numCircles
         };
@@ -85,26 +97,116 @@ export default class SceneBuilder {
             uniLocations.splice(0);
             uniLocations.push(gl.getUniformLocation(program, 'u_translate'));
             uniLocations.push(gl.getUniformLocation(program, 'u_scale'));
+            uniLocations.push(gl.getUniformLocation(program, 'u_rotationDegrees'));
             for (let i = 0; i < numCircles; i++) {
                 uniLocations.push(gl.getUniformLocation(program, `u_circles[${i}]`));
             }
         };
         scene.addUniLocationsSetter(setUnformLocations);
 
-        const circles = [
-            new Circle(1, 1, 1),
-            new Circle(-1, 1, 1),
-            new Circle(-1, -1, 1),
-            new Circle(1, -1, 1)
-        ];
+        const c1TimeLine = new TimeLine(0);
+        c1TimeLine.addCurve(new EaseOutCubic(Music.measureIntervalMillis * 8,
+                                             Music.measureIntervalMillis * 8 + 200, 1));
+        c1TimeLine.bindField(circles[0], 'r');
+        scene.addTimeLine(c1TimeLine);
 
+        const c2TimeLine = new TimeLine(0);
+        let ini = Music.measureIntervalMillis * 8 + Music.quarterIntervalMillis;
+        c2TimeLine.addCurve(new EaseOutCubic(ini, ini + 200, 1));
+        c2TimeLine.bindField(circles[1], 'r');
+        scene.addTimeLine(c2TimeLine);
+
+        const c3TimeLine = new TimeLine(0);
+        ini = Music.measureIntervalMillis * 8 + 2 * Music.quarterIntervalMillis;
+        c3TimeLine.addCurve(new EaseOutCubic(ini, ini + 200, 1));
+        c3TimeLine.bindField(circles[2], 'r');
+        scene.addTimeLine(c3TimeLine);
+
+        const c4TimeLine = new TimeLine(0);
+        ini = Music.measureIntervalMillis * 8 + 3 * Music.quarterIntervalMillis;
+        c4TimeLine.addCurve(new EaseOutCubic(ini, ini + 200, 1));
+        c4TimeLine.bindField(circles[3], 'r');
+        scene.addTimeLine(c4TimeLine);
+
+        // center
+        const c5TimeLine = new TimeLine(0);
+        ini = Music.measureIntervalMillis * 8 + 4 * Music.quarterIntervalMillis;
+        c5TimeLine.addCurve(new EaseOutCubic(ini, ini + 200, Math.sqrt(2) - 1));
+        c5TimeLine.bindField(circles[4], 'r');
+        scene.addTimeLine(c5TimeLine);
+
+        //
+        const c6TimeLine = new TimeLine(0);
+        ini = Music.measureIntervalMillis * 8 + 6 * Music.quarterIntervalMillis;
+        c6TimeLine.addCurve(new EaseOutCubic(ini, ini + 200, Math.sqrt(0.0116837)));
+        c6TimeLine.bindField(circles[5], 'r');
+        scene.addTimeLine(c6TimeLine);
+
+        const c7TimeLine = new TimeLine(0);
+        ini = Music.measureIntervalMillis * 8 + 7 * Music.quarterIntervalMillis;
+        c7TimeLine.addCurve(new EaseOutCubic(ini, ini + 200, Math.sqrt(0.0116837)));
+        c7TimeLine.bindField(circles[6], 'r');
+        scene.addTimeLine(c7TimeLine);
+
+        const c8TimeLine = new TimeLine(0);
+        ini = Music.measureIntervalMillis * 8 + 8 * Music.quarterIntervalMillis;
+        c8TimeLine.addCurve(new EaseOutCubic(ini, ini + 200, Math.sqrt(0.0116837)));
+        c8TimeLine.bindField(circles[7], 'r');
+        scene.addTimeLine(c8TimeLine);
+
+        const c9TimeLine = new TimeLine(0);
+        ini = Music.measureIntervalMillis * 8 + 9 * Music.quarterIntervalMillis;
+        c9TimeLine.addCurve(new EaseOutCubic(ini, ini + 200, Math.sqrt(0.0116837)));
+        c9TimeLine.bindField(circles[8], 'r');
+        scene.addTimeLine(c9TimeLine);
+
+        this.rotationRad = 0;
+        const rotationTimeLine = new TimeLine(0);
+        ini = Music.measureIntervalMillis * 8 + 5 * Music.quarterIntervalMillis;
+        rotationTimeLine.addCurve(new EaseOutCubic(ini, ini + Music.quarterIntervalMillis, Math.PI * 2));
+        rotationTimeLine.bindField(this, 'rotationRad');
+        scene.addTimeLine(rotationTimeLine);
+
+        let scale = 5.0;
+        const scaleTimeLine = new TimeLine(5);
+        scaleTimeLine.addCurve(new EaseOutCubic(ini, ini + 200, 2));
+        scaleTimeLine.bindField(this, '', (value) => {
+            scale = value;
+        });
+        scene.addTimeLine(scaleTimeLine);
+
+        ini = Music.measureIntervalMillis * 8 + 10 * Music.quarterIntervalMillis;
+        scaleTimeLine.addCurve(new EaseOutCubic(ini, ini + 200, 0.83));
+
+        rotationTimeLine.addCurve(new EaseOutCubic(ini, ini + 200, 0));
+
+        ini = Music.measureIntervalMillis * 8 + 11 * Music.quarterIntervalMillis;
+        scaleTimeLine.addCurve(new EaseOutCubic(ini, ini + 200, 0.83 * 0.8));
+
+        ini = Music.measureIntervalMillis * 8 + 12 * Music.quarterIntervalMillis;
+        scaleTimeLine.addCurve(new EaseOutCubic(ini, ini + 200, 0.83 * 0.8 * 0.8));
+
+        ini = Music.measureIntervalMillis * 8 + 13 * Music.quarterIntervalMillis;
+        scaleTimeLine.addCurve(new EaseOutCubic(ini, ini + 200, 0.83 * 0.8 * 0.8 * 0.8));
+
+        ini = Music.measureIntervalMillis * 8 + 14 * Music.quarterIntervalMillis;
+        scaleTimeLine.addCurve(new EaseOutCubic(ini, ini + 200, 0.83 * 0.8 * 0.8 * 0.8 * 0.8));
+
+        ini = Music.measureIntervalMillis * 8 + 15 * Music.quarterIntervalMillis;
+        scaleTimeLine.addCurve(new EaseOutCubic(ini, ini + 200, 0.01));
+
+        
         const translation = [0, 0];
-        const scale = 5.0;
         
         const setUniformValues = (gl) => {
             let index = 0;
             gl.uniform2f(uniLocations[index++], translation[0], translation[1]);
             gl.uniform1f(uniLocations[index++], scale);
+            gl.uniform1f(uniLocations[index++], this.rotationRad);
+            // gl.uniform3f(uniLocations[index++],
+            //              c1.center.x,
+            //              c1.center.y,
+            //              c1.r);
             for (let i = 0; i < numCircles; i++) {
                 gl.uniform3f(uniLocations[index++],
                              circles[i].center.x,
@@ -119,7 +221,7 @@ export default class SceneBuilder {
     }
 
     genFourCirclesChain() {
-        const scene = new Scene(this.canvas, CIRCLES_FRAG_TMPL);
+        const scene = new Scene(this.canvas, CHAIN_TMPL);
 
         const chain = new FourCirclesChain(0, 0, 1, 2.0);
         const circlesArray = chain.DFS();
@@ -160,11 +262,29 @@ export default class SceneBuilder {
         scene.addUniLocationsSetter(setUnformLocations);
 
         const translation = [0, 0];
-        const scale = 2.0;
+        let scale = 0.05;
+        const scaleTimeLine = new TimeLine(0);
+        let ini = Music.measureIntervalMillis * 12 + Music.quarterIntervalMillis;
+        scaleTimeLine.addCurve(new EaseOutCubic(ini, ini + 200, 1.0));
+
+        ini = Music.measureIntervalMillis * 12 + 3 * Music.quarterIntervalMillis;
+        scaleTimeLine.addCurve(new EaseOutCubic(ini, ini + 200, 0.3));
+
+        ini = Music.measureIntervalMillis * 12 + 5 * Music.quarterIntervalMillis;
+        scaleTimeLine.addCurve(new EaseOutCubic(ini, ini + 200, 0.4));
+
+        ini = Music.measureIntervalMillis * 12 + 7 * Music.quarterIntervalMillis;
+        scaleTimeLine.addCurve(new EaseOutCubic(ini, ini + 200, 0.5));
+        
+        scaleTimeLine.bindField(this, '', (value) => {
+            scale = value;
+        });
+        scene.addTimeLine(scaleTimeLine);
         
         const setUniformValues = (gl) => {
             let index = 0;
-            gl.uniform2f(uniLocations[index++], values[chain.index].x, values[chain.index].y);
+            //gl.uniform2f(uniLocations[index++], values[chain.index].x, values[chain.index].y);
+            gl.uniform2f(uniLocations[index++], 0, 0);
             gl.uniform1f(uniLocations[index++], scale);
             gl.uniform3f(uniLocations[index++],
                          chain.c1.center.x,
@@ -197,7 +317,7 @@ export default class SceneBuilder {
             chain.index = Math.floor(chain.index);
         });
         indexTimeLine.addCurve(new Linear(1000, 30000, values.length - 1));
-        scene.addTimeLine(indexTimeLine);
+        //scene.addTimeLine(indexTimeLine);
         
         scene.build();
         return scene;
@@ -215,9 +335,8 @@ export default class SceneBuilder {
                                   sphairahedron.boundingSphere.center,
                                   60, new Vec3(0, 1, 0));
 
-
         const cameraTimeLine = new TimeLine(0);
-        cameraTimeLine.addCurve(new Linear(0, Music.measureIntervalMillis * 7 + 2 * Music.eighthIntervalMillis, 7.0));
+        cameraTimeLine.addCurve(new Linear(0, Music.measureIntervalMillis * 7 + 200, 7.0));
         cameraTimeLine.bindField(camera, '', (value) => {
             camera.pos = new Vec3(0.5 * Math.cos(value), 2, 0.5 * Math.sin(value));
         });
@@ -235,27 +354,33 @@ export default class SceneBuilder {
         const ini = Music.measureIntervalMillis * 3;
         indexTimeLine.addCurve(new EaseInCubic(ini, ini + 200, 0.15 ));
         let startMillis2;
-        for(let i = 0; i < 15; i++) {
+        for(let i = 0; i < 16; i++) {
             const startMillis = ini + i * Music.quarterIntervalMillis;
             indexTimeLine.addCurve(new EaseOutCubic(startMillis + 200, startMillis + 400, -0.18 * (Math.floor(i / 4) + 1)));
+            if(i === 15) break;
             startMillis2 = ini + (i + 1) * Music.quarterIntervalMillis;
             indexTimeLine.addCurve(new EaseOutCubic(startMillis2, startMillis2 + 200, 0.18 * (Math.floor((i + 1) / 4) + 1)));
         }
+        startMillis2 = ini + (16) * Music.quarterIntervalMillis;
+        indexTimeLine.addCurve(new EaseOutCubic(startMillis2, startMillis2 + 200, 0.5));
+        startMillis2 = ini + (16) * Music.quarterIntervalMillis + Music.eighthIntervalMillis;
+        indexTimeLine.addCurve(new EaseOutCubic(startMillis2, startMillis2 + 200, 0.18 * (Math.floor(16 / 4) + 1)));
             
-        indexTimeLine.addCurve(new EaseOutCubic(ini + 16 * Music.quarterIntervalMillis-200,
-                                                ini + 16 * Music.quarterIntervalMillis + 200,
-                                                -0.6157635467980292));
-        scene.addTimeLine(indexTimeLine);
+        // indexTimeLine.addCurve(new EaseOutCubic(ini + 16 * Music.quarterIntervalMillis-200,
+        //                                         ini + 16 * Music.quarterIntervalMillis + 200,
+        //                                         -0.6157635467980292));
+
 
         const zcTimeLine = new TimeLine(0);
         zcTimeLine.bindField(sphairahedron, 'zc', () => {
             sphairahedron.update();
             camera.target = sphairahedron.boundingSphere.center;
         });
-        zcTimeLine.addCurve(new EaseOutCubic(ini + 16 * Music.quarterIntervalMillis - 200,
-                                             ini + 16 * Music.quarterIntervalMillis + 200,
-                                             0.6157635467980295));
-        scene.addTimeLine(zcTimeLine);
+        zcTimeLine.addCurve(new EaseOutCubic(startMillis2, startMillis2 + 200,
+                                             -1.2179686988505751));
+
+        scene.addTimeLine(indexTimeLine);
+        // scene.addTimeLine(zcTimeLine);
 
         // const cameraTimeLine2 = new TimeLine(0.5);
         // cameraTimeLine2.addCurve(new EaseOutCubic(startMillis2 + 200,

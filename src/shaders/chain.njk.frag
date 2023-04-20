@@ -13,7 +13,7 @@ uniform float u_rotationDegrees;
 {% include "./utils.njk.frag" %}
 
 vec3 computeColor(int invNum) {
-    return Hsv2rgb(0.0 + 0.1 * float(invNum - 1), 1.0, 1.0);
+    return Hsv2rgb(0.0 + 0.1 * float(invNum), 1.0, 1.0);
 }
 
 bool IIS(vec2 pos, out vec4 col) {
@@ -34,7 +34,7 @@ bool IIS(vec2 pos, out vec4 col) {
     }
 
     col = vec4(computeColor(invNum), 1);
-    return (invNum == 0) ? false : true;
+    return true;
 }
 
 const float MAX_SAMPLES = 10.;

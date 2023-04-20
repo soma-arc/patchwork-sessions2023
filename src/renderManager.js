@@ -19,7 +19,9 @@ export default class RenderManager {
     }
     
     progress(timeMillis) {
-        if(timeMillis > Music.measureIntervalMillis * 8) {
+        if(timeMillis > Music.measureIntervalMillis * 12) {
+            this.currentScene = this.chainScene;
+        } else if(timeMillis > Music.measureIntervalMillis * 8 - Music.quarterIntervalMillis) {
             this.currentScene = this.circlesScene;
         }
         this.currentScene.progress(timeMillis);

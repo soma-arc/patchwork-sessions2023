@@ -32,7 +32,7 @@ export default class Cube extends Sphairahedron {
                     
         this.inversionSphere = new Sphere(
             0,
-            1.5,//-this.prismSpheres[2].center.y + 0.5,
+            1.7,//-this.prismSpheres[2].center.y + 0.5,
             0,
             this.prismSpheres[2].r);
     }
