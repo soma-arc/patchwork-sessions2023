@@ -1,8 +1,9 @@
 import * as Tone from 'tone';
-import kick from './sounds/005SEPT-Kick.wav';
-import OHat from './sounds/020SEPTOpenHat.wav';
-import CHat from './sounds/001SEPTClosedHat.wav';
-import Clap from './sounds/014SEPTClap.wav';
+
+// import kick from './sounds/005SEPT-Kick.wav';
+// import OHat from './sounds/020SEPTOpenHat.wav';
+// import CHat from './sounds/001SEPTClosedHat.wav';
+// import Clap from './sounds/014SEPTClap.wav';
 import bgm from './sounds/sessions.wav';
 
 export default class Music {
@@ -18,10 +19,10 @@ export default class Music {
 
     async setup() {
         Tone.start();
-        this.kickPlayer = new Tone.Player(kick).toDestination();
-        this.ohatPlayer = new Tone.Player(OHat).toDestination();
-        this.chatPlayer = new Tone.Player(CHat).toDestination();
-        this.clapPlayer = new Tone.Player(Clap).toDestination();
+        // this.kickPlayer = new Tone.Player(kick).toDestination();
+        // this.ohatPlayer = new Tone.Player(OHat).toDestination();
+        // this.chatPlayer = new Tone.Player(CHat).toDestination();
+        // this.clapPlayer = new Tone.Player(Clap).toDestination();
         this.bgmPlayer = new Tone.Player(bgm).toDestination();
         await Tone.loaded();
         

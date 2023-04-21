@@ -9,6 +9,10 @@ export default class Canvas {
      */
     constructor(canvasId) {
         this.canvas = document.getElementById(canvasId);
+        
+        //this.canvas.width = window.screen.width;
+        //this.canvas.height = window.screen.height;
+        console.log(this.canvas.width, this.canvas.height);
         this.gl = GLUtils.GetWebGL2Context(this.canvas);
 
         this.vertexBuffer = GLUtils.CreateSquareVbo(this.gl);

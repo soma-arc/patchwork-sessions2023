@@ -32,7 +32,7 @@ export default class Sphairahedron {
         this.bboxMin = [Number.MAX_VALUE, Number.MAX_VALUE, Number.MAX_VALUE];
         this.bboxMax = [-Number.MAX_VALUE, -Number.MAX_VALUE, -Number.MAX_VALUE];
 
-        this.maxIterations = 100;
+        this.maxIterations = 80;
         this.fudgeFactor = 0.2;
 
         this.inversionSphereScale = 1.0;

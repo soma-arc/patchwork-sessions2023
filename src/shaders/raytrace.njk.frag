@@ -72,6 +72,34 @@ void IntersectSphere(const int objId, const vec3 matColor,
     }
 }
 
+bool IntersectBoundingSphere(vec3 sphereCenter, float radius,
+                             vec3 rayOrigin, vec3 rayDir,
+                             out float t0, out float t1){
+	vec3 v = rayOrigin - sphereCenter;
+	float b = dot(rayDir, v);
+	float c = dot(v, v) - radius * radius;
+	float d = b * b - c;
+	const float EPSILON = 0.0001;
+	if(d >= 0.){
+		float s = sqrt(d);
+		float tm = -b - s;
+		t0 = tm;
+		if(tm <= EPSILON){
+			tm = -b + s;
+            t1 = tm;
+			t0 = 0.;
+		}else{
+			t1 = -b + s;
+		}
+		if(EPSILON < tm){
+			return true;
+		}
+	}
+    t0 = 0.;
+    t1 = MAX_FLOAT;
+	return false;
+}
+
 // const float DIV_PI = 1.0 / PI;
 // const vec3 dielectricSpecular = vec3(0.04);
 

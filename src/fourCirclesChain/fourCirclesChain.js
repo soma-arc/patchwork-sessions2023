@@ -21,7 +21,7 @@ export default class FourCirclesChain {
     update() {
         const pqMid = this.p.add(this.q).scale(0.5);
         const u = pqMid.sub(this.center).scale(1.0 / Vec2.distance(this.center, pqMid));
-        const a = u.scale(this.radius * Math.sin(this.param) * 6. + 6.72).add(this.center);
+        const a = u.scale(this.radius * this.param).add(this.center);
         this.c1 = new Circle(a.x, a.y, Vec2.distance(a, this.p));
         
         const aq = new Line(a, this.q);

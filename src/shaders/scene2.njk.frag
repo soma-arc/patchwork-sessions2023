@@ -30,7 +30,7 @@ vec3 computeNormal(const vec3 p) {
                           distFunc(p + NORMAL_COEFF.yyx).x - distFunc(p - NORMAL_COEFF.yyx).x));
 }
 
-const int MAX_MARCHING_LOOP = 5000;
+const int MAX_MARCHING_LOOP = 1000;
 const float MARCHING_THRESHOLD = 0.00001;
 void march(const vec3 rayOrg, const vec3 rayDir,
            const float tmin, const float tmax,
@@ -68,7 +68,14 @@ vec4 computeColor(const vec3 rayOrigin, const vec3 rayDir) {
     vec3 l = vec3(0);
     vec3 rayPos = rayOrigin;
 
-    march(rayPos, rayDir, 0., 1000., isectInfo);
+    float tmin = 0.;
+    float tmax = MAX_FLOAT;
+    bool hit = IntersectBoundingSphere(u_sphairahedron.boundingSphere.xyz,
+                                       u_sphairahedron.boundingSphere.w,
+                                       rayPos, rayDir,
+                                       tmin, tmax);
+    if(hit)
+        march(rayPos, rayDir, tmin, tmax, isectInfo);
 
     if(isectInfo.hit) {
         const vec3 ambientFactor = vec3(0.3);

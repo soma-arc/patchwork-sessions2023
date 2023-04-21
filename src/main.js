@@ -13,7 +13,7 @@ window.addEventListener('load', () => {
 
 async function start(fullscreen) {
     let stop = false;
-    const fps = 60;
+    const fps = 30;
     const intervalMillis = 1000 / fps;
 
     const renderManager = new RenderManager('canvas');
@@ -31,12 +31,12 @@ async function start(fullscreen) {
             return;   
         }
         const timeMillis = Date.now() - startMillis;
-        if (timeMillis >= prevTimeMillis + intervalMillis) {
-            const t = prevTimeMillis + intervalMillis;
-            renderManager.progress(t);
-            renderManager.render();
-            prevTimeMillis += intervalMillis;
-        }
+        //if (timeMillis >= prevTimeMillis + intervalMillis) {
+        const t = prevTimeMillis + intervalMillis;
+        renderManager.progress(timeMillis);
+        renderManager.render();
+        prevTimeMillis += intervalMillis;
+    //}
         requestAnimationFrame(loop);
     };
 
