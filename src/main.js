@@ -9,6 +9,10 @@ window.addEventListener('load', () => {
     document.getElementById('startButton').addEventListener('click', () => {
         start(false);
     });
+
+    document.getElementById('renderProductButton').addEventListener('click', () => {
+        renderProduct();
+    });
 });
 
 async function start(fullscreen) {
@@ -28,7 +32,7 @@ async function start(fullscreen) {
     const loop = () => {
         if(stop) {
             music.stop();
-            return;   
+            return;
         }
         const timeMillis = Date.now() - startMillis;
         //if (timeMillis >= prevTimeMillis + intervalMillis) {
@@ -48,9 +52,23 @@ async function start(fullscreen) {
     }
 
     document.addEventListener('fullscreenchange', fullscreenchanged);
-    
+
     renderManager.progress(0);
     renderManager.render();
     music.start();
     loop();
+}
+
+async function renderProduct() {
+    const fps = 30;
+    const intervalMillis = 1000 / fps;
+
+    const renderManager = new RenderManager('canvas');
+    renderManager.init();
+
+    const t = 0;
+    for(let i = 0; i < 1; i++) {
+        renderManager.progress(t);
+        await renderManager.renderAndSave('test.png');
+    }
 }

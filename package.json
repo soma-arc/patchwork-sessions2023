@@ -23,7 +23,7 @@
     "start": "webpack serve"
   },
   "dependencies": {
-    "nunjucks": "^3.2.3",
+    "nunjucks": "^3.2.4",
     "nunjucks-loader": "^3.0.0",
     "perlin-simplex": "^0.0.3",
     "tone": "^14.7.77"

@@ -37,6 +37,12 @@ export default class RenderManager {
         this.canvas.renderTextureToCanvas(this.currentScene.outputTexture);
     }
 
+    async renderAndSave(filename) {
+        this.currentScene.renderToTexture();
+        this.canvas.renderTextureToCanvasFlipped(this.currentScene.outputTexture);
+        await this.canvas.save(filename);
+    }
+
     renderGraph() {
         const graphCanvas = document.getElementById('graphCanvas');
         const ctx = graphCanvas.getContext('2d');
